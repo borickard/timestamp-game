@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Timestamp</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main class="app">
+    <header class="top">
+      <h1>Timestamp</h1>
+      <div class="hud" id="hud" hidden>
+        <span>Film <strong id="hud-round"></strong></span>
+        <span>Score <strong id="hud-score">0</strong></span>
+      </div>
+    </header>
+
+    <!-- Start -->
+    <section class="screen" id="screen-start">
+      <p class="lede">Pick a moment in a mystery film. You get one frozen frame from it. Name the film.</p>
+      <ul class="rules">
+        <li>Films come from the IMDb Top 250.</li>
+        <li>Choose how far into the film to look, then guess the title.</li>
+        <li>Stuck? Ask for another frame, but each extra frame and each wrong guess costs points.</li>
+      </ul>
+      <label class="field">
+        <span>Your name</span>
+        <input id="player-name" maxlength="24" placeholder="Player 1" autocomplete="nickname">
+      </label>
+      <button class="btn primary" id="btn-start">Start game</button>
+      <p class="best" id="best-score"></p>
+    </section>
+
+    <!-- Game -->
+    <section class="screen" id="screen-game" hidden>
+      <div class="frame" id="frame">
+        <div class="frame-inner"><div id="yt-host"></div></div>
+        <div class="shield" aria-hidden="true"></div>
+        <div class="curtain" id="curtain">
+          <div class="curtain-text" id="curtain-text">Mystery film</div>
+        </div>
+      </div>
+
+      <div class="timeline" id="timeline" aria-label="Frames you've looked at"></div>
+
+      <!-- Choose a moment -->
+      <div class="panel" id="panel-pick">
+        <label class="field">
+          <span>How far into the film? <strong class="time" id="pick-time">0:00</strong></span>
+          <input type="range" id="pick-slider" min="0" max="100" step="1" value="50">
+        </label>
+        <div class="row">
+          <button class="btn" id="btn-random">Surprise me</button>
+          <button class="btn primary" id="btn-show">Show frame</button>
+        </div>
+        <p class="hint" id="pick-hint"></p>
+      </div>
+
+      <!-- Guess -->
+      <form class="panel" id="panel-guess" hidden autocomplete="off">
+        <label class="field">
+          <span>Which film is it? <span class="muted" id="guesses-left"></span></span>
+          <input id="guess-input" list="titles" placeholder="Type a title…" required>
+          <datalist id="titles"></datalist>
+        </label>
+        <p class="feedback" id="guess-feedback" role="status"></p>
+        <div class="row">
+          <button type="button" class="btn" id="btn-another">Another frame <span class="cost">−20</span></button>
+          <button type="button" class="btn ghost" id="btn-giveup">Give up</button>
+          <button type="submit" class="btn primary">Guess</button>
+        </div>
+      </form>
+
+      <!-- Result -->
+      <div class="panel" id="panel-result" hidden>
+        <p class="verdict" id="result-verdict"></p>
+        <h2 class="answer" id="result-title"></h2>
+        <p class="muted" id="result-meta"></p>
+        <div class="row">
+          <button class="btn" id="btn-scene">Play the scene</button>
+          <a class="btn ghost" id="result-link" target="_blank" rel="noopener">Watch on YouTube</a>
+          <button class="btn primary" id="btn-next">Next film</button>
+        </div>
+      </div>
+
+      <p class="error" id="game-error" role="alert" hidden></p>
+    </section>
+
+    <!-- End -->
+    <section class="screen" id="screen-end" hidden>
+      <h2 id="end-title">Final score</h2>
+      <p class="big-score" id="end-score"></p>
+      <ol class="recap" id="end-recap"></ol>
+      <button class="btn primary" id="btn-again">Play again</button>
+    </section>
+  </main>
+
+  <script type="module" src="js/game.js"></script>
+</body>
+</html>
