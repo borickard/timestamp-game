@@ -180,27 +180,47 @@ function randomMoment() {
 async function showFrame() {
   const seconds = Number($("pick-slider").value);
   $("btn-show").disabled = true;
+  if (await loadFrame(seconds)) {
+    state.frames.push(seconds);
+    renderTimeline();
+    panel("guess");
+    updateGuessesLeft();
+    $("guess-input").focus();
+  }
+}
+
+// Shows the frame at `seconds` behind the curtain and lifts it. Returns false,
+// and moves on to the next film, when no upload of this film can be shown.
+async function loadFrame(seconds) {
+  const movie = state.movie;
   showError("");
   setCurtain("Rolling film…");
   try {
     await playerReady;
-    const duration = await player.showStill(state.movie, seconds);
+    const duration = await player.showStill(movie, seconds);
+    if (state.movie !== movie) return false;
     if (duration) state.duration = duration;
-    state.frames.push(seconds);
-    renderTimeline();
     setCurtain(null);
-    panel("guess");
-    updateGuessesLeft();
-    $("guess-input").focus();
+    return true;
   } catch (err) {
+    if (err.message === "cancelled" || state.movie !== movie) return false;
     setCurtain("Projector jammed");
     showError(`${err.message} Skipping to the next film.`);
     // Don't charge the player for a film that can't be shown.
-    state.history.push({ movie: state.movie, points: 0, skipped: true });
+    state.history.push({ movie, points: 0, skipped: true });
     $("btn-show").disabled = false;
     setTimeout(nextRound, 2500);
+    return false;
   }
 }
+
+// The video on screen was taken down or failed after it loaded, so YouTube is
+// showing its error page. Hide it and show the same moment from another upload.
+player.onBroken = () => {
+  const last = state.frames[state.frames.length - 1];
+  if (last === undefined) return;
+  loadFrame(last);
+};
 
 function updateGuessesLeft() {
   const left = MAX_GUESSES - state.wrong;

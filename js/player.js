@@ -37,6 +37,9 @@ export class StillPlayer {
     this.player = null;
     this.videoId = null;
     this.pending = null; // { resolve, reject, target, timer }
+    this.scenePlaying = false;
+    this.badIds = new Set(); // failed this session, so not retried
+    this.onBroken = null; // called if the video on screen stops working
     this.workingIds = loadWorkingIds();
   }
 
@@ -70,7 +73,7 @@ export class StillPlayer {
   // Candidate IDs for a movie, with the last one known to work first.
   candidates(movie) {
     const known = this.workingIds[movie.imdb];
-    const ids = movie.youtube.slice();
+    const ids = movie.youtube.filter((id) => !this.badIds.has(id));
     if (known && ids.includes(known)) {
       ids.splice(ids.indexOf(known), 1);
       ids.unshift(known);
@@ -81,11 +84,14 @@ export class StillPlayer {
   // Shows the frame at `seconds` into the movie. Resolves with the video's
   // duration in seconds, or rejects when no candidate video can be played.
   async showStill(movie, seconds) {
+    this.scenePlaying = false;
     if (this.videoId && this.movie === movie) {
       try {
         return await this.seekAndFreeze(seconds);
-      } catch {
+      } catch (err) {
+        if (err.message === "cancelled") throw err;
         // The current video stopped working; fall through and try the rest.
+        this.forget(this.videoId);
       }
     }
     this.movie = movie;
@@ -97,6 +103,8 @@ export class StillPlayer {
         saveWorkingIds(this.workingIds);
         return duration;
       } catch (err) {
+        if (err.message === "cancelled") throw err;
+        this.forget(id);
         console.warn(`YouTube video ${id} for ${movie.title} is unusable:`, err.message);
       }
     }
@@ -140,8 +148,14 @@ export class StillPlayer {
   }
 
   onStateChange(e) {
+    const { PLAYING } = window.YT.PlayerState;
     const p = this.pending;
-    if (!p || e.data !== window.YT.PlayerState.PLAYING || p.checking) return;
+    if (!p) {
+      // Only "Play the scene" may play a video once a still is on screen.
+      if (e.data === PLAYING && this.videoId && !this.scenePlaying) this.player.pauseVideo();
+      return;
+    }
+    if (e.data !== PLAYING || p.checking) return;
     p.checking = true;
 
     const duration = this.player.getDuration();
@@ -150,27 +164,63 @@ export class StillPlayer {
       this.player.stopVideo();
       return;
     }
+    const goal = Math.min(p.target, duration || Infinity);
 
     // Wait until playback has actually reached the requested time, so the
     // frame shown is the one asked for and not a stale frame from before.
-    const poll = () => {
+    const seek = () => {
       if (this.pending !== p) return;
       const t = this.player.getCurrentTime();
-      const goal = Math.min(p.target, duration || Infinity);
       if (t >= goal - 1 && t < goal + 5) {
         this.player.pauseVideo();
-        // Give the pause a moment to settle before lifting the curtain.
-        setTimeout(() => this.finish((q) => q.resolve(duration)), 300);
+        settle(t, 0);
       } else {
-        setTimeout(poll, 100);
+        setTimeout(seek, 100);
       }
     };
-    poll();
+
+    // Then wait until the player really is paused and the picture has stopped
+    // moving before lifting the curtain. pauseVideo() is asynchronous and is
+    // sometimes ignored while buffering, so keep re-issuing it until it holds.
+    const settle = (lastT, steady) => {
+      setTimeout(() => {
+        if (this.pending !== p) return;
+        const t = this.player.getCurrentTime();
+        if (this.player.getPlayerState() !== window.YT.PlayerState.PAUSED) {
+          this.player.pauseVideo();
+          settle(t, 0);
+        } else if (Math.abs(t - lastT) < 0.01 && steady >= 2) {
+          this.finish((q) => q.resolve(duration));
+        } else {
+          settle(t, Math.abs(t - lastT) < 0.01 ? steady + 1 : 0);
+        }
+      }, 120);
+    };
+    seek();
   }
 
   onError(e) {
     // 2: bad id, 5: HTML5 error, 100: removed/private, 101/150: embedding disabled.
-    this.finish((q) => q.reject(new Error(`YouTube error ${e.data}`)));
+    if (this.pending) {
+      this.finish((q) => q.reject(new Error(`YouTube error ${e.data}`)));
+      return;
+    }
+    // An error after a still was shown means YouTube has replaced the frame
+    // with its own error screen. Drop the video and let the game recover.
+    if (this.videoId) {
+      console.warn(`YouTube video ${this.videoId} broke after loading: error ${e.data}`);
+      this.forget(this.videoId);
+      this.videoId = null;
+      this.onBroken?.();
+    }
+  }
+
+  forget(id) {
+    this.badIds.add(id);
+    for (const [imdb, known] of Object.entries(this.workingIds)) {
+      if (known === id) delete this.workingIds[imdb];
+    }
+    saveWorkingIds(this.workingIds);
   }
 
   finish(fn) {
@@ -184,6 +234,7 @@ export class StillPlayer {
   // Plays the current scene with sound, used after the answer is revealed.
   playScene() {
     if (!this.videoId) return;
+    this.scenePlaying = true;
     this.player.unMute();
     this.player.playVideo();
   }
@@ -194,8 +245,9 @@ export class StillPlayer {
 
   stop() {
     this.cancelPending();
-    if (this.player && this.player.stopVideo) this.player.stopVideo();
+    this.scenePlaying = false;
     this.videoId = null;
+    if (this.player && this.player.stopVideo) this.player.stopVideo();
     this.movie = null;
   }
 
