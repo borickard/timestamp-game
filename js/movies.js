@@ -1,5 +1,9 @@
 // Movie catalog.
 //
+// Films come from two places: the hand-written list below, and js/found.js,
+// which scripts/find-uploads.mjs generates by searching YouTube. When a film
+// is in both, its video IDs are combined, hand-picked ones first.
+//
 // PLAYABLE holds films from the IMDb Top 250 with full-length uploads on YouTube.
 // Each film lists one or more candidate video IDs: the player tries them in
 // order and skips any that are removed, blocked from embedding, or clearly
@@ -24,7 +28,9 @@
 //             cropped away. Defaults to 1.34, which suits 4:3 films; use about
 //             1.25 for widescreen films letterboxed in a 16:9 upload.
 
-export const PLAYABLE = [
+import { FOUND } from "./found.js";
+
+const HANDPICKED = [
   {
     imdb: "tt0012349",
     title: "The Kid",
@@ -93,6 +99,19 @@ export const PLAYABLE = [
     zoom: 1.25,
   },
 ];
+
+function merge(handpicked, found) {
+  const films = handpicked.map((m) => ({ ...m, youtube: [...m.youtube] }));
+  const byId = new Map(films.map((m) => [m.imdb, m]));
+  for (const f of found) {
+    const existing = byId.get(f.imdb);
+    if (!existing) films.push(f);
+    else existing.youtube = [...new Set([...existing.youtube, ...f.youtube])];
+  }
+  return films.filter((m) => m.youtube.length);
+}
+
+export const PLAYABLE = merge(HANDPICKED, FOUND);
 
 // Titles from the IMDb Top 250 used for guess autocomplete, so the answer
 // can't be found just by scrolling a short list of playable films.

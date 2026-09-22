@@ -46,6 +46,27 @@ one or more YouTube IDs. For widescreen films, set `zoom: 1.25` so the picture
 isn't cropped too much. Each entry already has `genres` and `year`, ready for
 genre and decade filters.
 
+### Finding uploads automatically
+
+`scripts/find-uploads.mjs` searches YouTube for "<title> <year> full movie" for
+each film in `scripts/films.json` (the IMDb top 10 for now; add more there). It
+keeps results whose length is close to the film's runtime and whose title names
+the film, and skips trailers, reviews, clips and sequels. Matches go into
+`js/found.js`, which the game merges into its catalog. Run it on your own
+computer (Node 22.12 or newer):
+
+```sh
+cd scripts
+npm install
+npx playwright install chromium
+node find-uploads.mjs            # all films
+node find-uploads.mjs --only godfather --headed --dry   # try one, watch it, don't save
+```
+
+Re-running keeps IDs from earlier runs and adds new ones. Then open
+`/check.html` to see which of them actually embed. The `scripts` folder isn't
+deployed (see `.vercelignore`).
+
 ### Checking for dead videos
 
 Uploads get taken down. Open `/check.html` on the site and click **Run check**.

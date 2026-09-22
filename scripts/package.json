@@ -1,0 +1,13 @@
+{
+  "name": "timestamp-scripts",
+  "private": true,
+  "engines": { "node": ">=22.12" },
+  "type": "module",
+  "description": "Helper scripts for the Timestamp game. Not part of the website.",
+  "scripts": {
+    "find": "node find-uploads.mjs"
+  },
+  "dependencies": {
+    "playwright": "^1.55.0"
+  }
+}

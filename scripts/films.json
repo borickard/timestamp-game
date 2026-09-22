@@ -1,0 +1,12 @@
+[
+  { "imdb": "tt0111161", "title": "The Shawshank Redemption", "year": 1994, "runtime": 142, "genres": ["Drama"] },
+  { "imdb": "tt0068646", "title": "The Godfather", "year": 1972, "runtime": 175, "genres": ["Crime", "Drama"] },
+  { "imdb": "tt0468569", "title": "The Dark Knight", "year": 2008, "runtime": 152, "genres": ["Action", "Crime", "Drama"] },
+  { "imdb": "tt0071562", "title": "The Godfather Part II", "year": 1974, "runtime": 202, "genres": ["Crime", "Drama"], "aliases": ["The Godfather 2", "Godfather Part 2"] },
+  { "imdb": "tt0050083", "title": "12 Angry Men", "year": 1957, "runtime": 96, "genres": ["Crime", "Drama"], "aliases": ["Twelve Angry Men"] },
+  { "imdb": "tt0108052", "title": "Schindler's List", "year": 1993, "runtime": 195, "genres": ["Biography", "Drama", "History"] },
+  { "imdb": "tt0167260", "title": "The Lord of the Rings: The Return of the King", "year": 2003, "runtime": 201, "genres": ["Action", "Adventure", "Drama"], "aliases": ["The Return of the King", "Return of the King", "LOTR Return of the King"] },
+  { "imdb": "tt0110912", "title": "Pulp Fiction", "year": 1994, "runtime": 154, "genres": ["Crime", "Drama"] },
+  { "imdb": "tt0120737", "title": "The Lord of the Rings: The Fellowship of the Ring", "year": 2001, "runtime": 178, "genres": ["Action", "Adventure", "Drama"], "aliases": ["The Fellowship of the Ring", "Fellowship of the Ring", "LOTR Fellowship of the Ring"] },
+  { "imdb": "tt0060196", "title": "The Good, the Bad and the Ugly", "year": 1966, "runtime": 178, "genres": ["Adventure", "Western"], "aliases": ["Il buono, il brutto, il cattivo", "The Good the Bad and the Ugly"] }
+]
