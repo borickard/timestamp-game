@@ -111,7 +111,20 @@ function merge(handpicked, found) {
   return films.filter((m) => m.youtube.length);
 }
 
-export const PLAYABLE = merge(HANDPICKED, FOUND);
+// While trying out a set of films, list their IMDb ids here to play only
+// those. Leave it empty to play every film in the catalog.
+const ONLY = [
+  "tt0111161", // The Shawshank Redemption
+  "tt0068646", // The Godfather
+  "tt0468569", // The Dark Knight
+  "tt0071562", // The Godfather Part II
+  "tt0050083", // 12 Angry Men
+  "tt0108052", // Schindler's List
+  "tt0060196", // The Good, the Bad and the Ugly
+];
+
+const ALL = merge(HANDPICKED, FOUND);
+export const PLAYABLE = ONLY.length ? ALL.filter((m) => ONLY.includes(m.imdb)) : ALL;
 
 // Titles from the IMDb Top 250 used for guess autocomplete, so the answer
 // can't be found just by scrolling a short list of playable films.
