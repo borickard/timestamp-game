@@ -10,11 +10,11 @@
 const LOAD_TIMEOUT_MS = 15000;
 // A candidate shorter than this share of the film's runtime is a clip or
 // trailer rather than the full film.
-const MIN_RUNTIME_SHARE = 0.6;
+export const MIN_RUNTIME_SHARE = 0.6;
 
 let apiReady = null;
 
-function loadApi() {
+export function loadApi() {
   if (apiReady) return apiReady;
   apiReady = new Promise((resolve, reject) => {
     if (window.YT && window.YT.Player) return resolve(window.YT);

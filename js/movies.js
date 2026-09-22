@@ -1,14 +1,14 @@
 // Movie catalog.
 //
 // PLAYABLE holds films from the IMDb Top 250 with full-length uploads on YouTube.
-// For now that's only films in the US public domain, since those can be embedded
-// without relying on pirated uploads. Each film lists several candidate video
-// IDs: the player tries them in order and skips any that are removed, blocked
-// from embedding, or clearly shorter than the film (i.e. a clip or trailer).
+// Each film lists one or more candidate video IDs: the player tries them in
+// order and skips any that are removed, blocked from embedding, or clearly
+// shorter than the film (i.e. a clip or trailer). Uploads get taken down, so
+// open check.html now and then to see which IDs still work and replace the
+// dead ones.
 //
-// To add a film (e.g. one a studio has put on its official channel for free),
-// add an entry with its IMDb id, runtime in minutes and one or more YouTube IDs.
-// `genres` and `decade` are included so genre/era filters can be added later.
+// To add a film, add an entry with its IMDb id, runtime in minutes and one or
+// more YouTube IDs. `genres` and `year` are there for genre/decade filters.
 //
 // Fields:
 //   imdb      IMDb id (tt...)
@@ -20,6 +20,9 @@
 //   youtube   Candidate YouTube video IDs, best first
 //   skipStart Minutes at the start to exclude (opening titles give the answer away)
 //   skipEnd   Minutes at the end to exclude (end credits / "The End" cards)
+//   zoom      Optional. How much to scale the video so YouTube's bars are
+//             cropped away. Defaults to 1.34, which suits 4:3 films; use about
+//             1.25 for widescreen films letterboxed in a 16:9 upload.
 
 export const PLAYABLE = [
   {
@@ -76,6 +79,18 @@ export const PLAYABLE = [
     youtube: ["enwB5zZfaV4", "rv3WtVKKdhU", "x0FjSj4oHyA", "cDHmIaEXvmA", "hu2Ag4fsZd4"],
     skipStart: 4,
     skipEnd: 3,
+  },
+  {
+    imdb: "tt4154756",
+    title: "Avengers: Infinity War",
+    year: 2018,
+    runtime: 149,
+    genres: ["Action", "Adventure", "Sci-Fi"],
+    aliases: ["Infinity War", "Avengers Infinity War", "Avengers 3"],
+    youtube: ["E7gbDEwMtL4"],
+    skipStart: 3,
+    skipEnd: 12,
+    zoom: 1.25,
   },
 ];
 

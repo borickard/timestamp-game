@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Timestamp · Video check</title>
+  <meta name="robots" content="noindex">
+  <link rel="stylesheet" href="style.css">
+  <style>
+    table { width: 100%; border-collapse: collapse; margin-top: 16px; font-size: 0.95rem; }
+    th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--surface-2); vertical-align: top; }
+    th { color: var(--muted); font-weight: 600; }
+    td code { font-size: 0.9em; }
+    td a { color: inherit; }
+    .ok { color: var(--win); }
+    .bad { color: var(--lose); }
+    .wait { color: var(--muted); }
+    .probe { width: 320px; max-width: 100%; aspect-ratio: 16 / 9; margin-top: 16px; }
+    .summary { margin: 16px 0 0; }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <header class="top"><h1>Video check</h1></header>
+    <p class="lede">Tests every YouTube ID in <code>js/movies.js</code>: is it still up, can it be embedded, and is it the full film?</p>
+    <p class="muted">Dead IDs are safe to leave in while a film has at least one working one, but replace them when you can.</p>
+    <button class="btn primary" id="btn-run">Run check</button>
+    <p class="summary" id="summary" role="status"></p>
+    <div class="probe"><div id="probe"></div></div>
+    <table>
+      <thead><tr><th>Film</th><th>Video</th><th>Status</th></tr></thead>
+      <tbody id="rows"></tbody>
+    </table>
+  </main>
+  <script type="module" src="js/check.js"></script>
+</body>
+</html>

@@ -36,17 +36,22 @@ YouTube player both need an `http(s)` origin.)
 
 `js/movies.js` has two lists:
 
-- `PLAYABLE`: the films the game can show. For now these are the Top 250 films
-  that are public domain in the US (The Kid, Sherlock Jr., The Gold Rush,
-  The General, Metropolis), since full uploads of those can be embedded
-  legitimately.
+- `PLAYABLE`: the films the game can show, each with one or more YouTube IDs
+  of full-length uploads. The game uses the first one that works.
 - `TITLE_POOL`: Top 250 titles used for guess autocomplete, so the answer isn't
   obvious from a short list.
 
 To add a film, add an entry to `PLAYABLE` with its IMDb id, runtime, genres and
-one or more YouTube IDs. Good sources are official studio channels that post free
-full-length films. Each entry already has `genres` and `year`, ready for
+one or more YouTube IDs. For widescreen films, set `zoom: 1.25` so the picture
+isn't cropped too much. Each entry already has `genres` and `year`, ready for
 genre and decade filters.
+
+### Checking for dead videos
+
+Uploads get taken down. Open `/check.html` on the site and click **Run check**.
+It loads every ID and reports whether it's OK, removed, not embeddable, or too
+short to be the full film. Replace the dead ones in `js/movies.js`; a film keeps
+working as long as one of its IDs does.
 
 ## Roadmap
 

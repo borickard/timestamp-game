@@ -140,6 +140,8 @@ function startRound() {
   state.frames = [];
   state.wrong = 0;
   player.stop();
+  if (state.movie.zoom) $("frame").style.setProperty("--zoom", state.movie.zoom);
+  else $("frame").style.removeProperty("--zoom");
   showError("");
   setCurtain(`Mystery film #${state.round + 1}`);
   $("guess-input").value = "";
