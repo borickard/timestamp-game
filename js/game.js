@@ -6,7 +6,13 @@ const MAX_GUESSES = 3;
 const POINTS = { base: 100, extraFrame: 20, wrongGuess: 15, floor: 10 };
 
 const $ = (id) => document.getElementById(id);
-const player = new StillPlayer("yt-host");
+// Phones get "hold" mode, because YouTube covers paused videos with its own
+// UI there (see player.js). Add ?hold=1 or ?hold=0 to the URL to force it.
+const holdParam = new URLSearchParams(location.search).get("hold");
+const HOLD = holdParam
+  ? holdParam === "1"
+  : matchMedia("(hover: none) and (pointer: coarse)").matches;
+const player = new StillPlayer("yt-host", { hold: HOLD });
 let playerReady = null;
 
 // `players` is an array so a multiplayer mode and scoreboard can slot in later.
